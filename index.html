@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c130d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="二十三的酒">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png" type="image/png">
+<title>二十三的酒 · 调酒笔记与每日打卡</title>
+<style>
+:root{
+  --bg0:#14100c; --bg1:#211710; --surface:#2b1e14; --surface2:#352517;
+  --line:rgba(232,176,75,.16); --line2:rgba(232,176,75,.32);
+  --ink:#f4e8d6; --ink2:#d9c4a6; --muted:#a98d6f;
+  --gold:#e8b04b; --gold2:#ffd27f; --amber:#ff9d5c; --wine:#c25b4e;
+  --shadow:0 12px 34px rgba(0,0,0,.45);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+button,input,select,textarea{touch-action:manipulation}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; min-height:100dvh; color:var(--ink);
+  background:#17100c;
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
+  line-height:1.6;
+  -webkit-tap-highlight-color:transparent;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1;
+  background:
+    radial-gradient(1100px 620px at 50% -8%, rgba(232,176,75,.16), transparent 62%),
+    radial-gradient(900px 520px at 96% 112%, rgba(194,91,78,.12), transparent 60%),
+    radial-gradient(760px 460px at 2% 96%, rgba(255,157,92,.08), transparent 55%),
+    linear-gradient(180deg,var(--bg1) 0%,var(--bg0) 70%);
+}
+.wrap{max-width:1080px;margin:0 auto;padding:max(24px,env(safe-area-inset-top)) 20px calc(64px + env(safe-area-inset-bottom))}
+
+/* header */
+header.bar{text-align:center;padding:34px 16px 22px}
+.brand{display:flex;align-items:center;justify-content:center;gap:14px}
+.brand-emoji{font-size:42px;filter:drop-shadow(0 4px 14px rgba(232,176,75,.4))}
+.brand-text{
+  font-family:Georgia,"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  font-size:40px; letter-spacing:6px; font-weight:700;
+  background:linear-gradient(120deg,var(--gold2),var(--gold) 45%,var(--amber));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.brand-sub{margin-top:8px;color:var(--muted);font-size:13px;letter-spacing:5px}
+.date-chip{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 16px;
+  background:rgba(43,30,20,.7);border:1px solid var(--line);border-radius:999px;
+  color:var(--ink2);font-size:13px;
+}
+/* tabs */
+.tabs{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.tab{
+  padding:12px 20px;min-height:44px;border-radius:999px;border:1px solid var(--line);
+  background:rgba(43,30,20,.55);color:var(--ink2);font-size:15px;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+.tab:hover{border-color:var(--line2);color:var(--gold2);transform:translateY(-1px)}
+.tab.active{background:linear-gradient(135deg,var(--gold),var(--amber));color:#2a1603;border-color:transparent;font-weight:600;box-shadow:0 6px 20px rgba(232,176,75,.28)}
+section.page{display:none;animation:fade .35s ease}
+section.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-title{font-family:Georgia,"Noto Serif SC","Songti SC",serif;font-size:24px;margin:26px 0 4px;color:var(--gold2)}
+.page-desc{color:var(--muted);font-size:13px;margin:0 0 18px}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+.card{
+  background:linear-gradient(180deg,var(--surface2),var(--surface));
+  border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 18px;
+  box-shadow:var(--shadow);position:relative;display:flex;flex-direction:column;gap:10px;
+  transition:transform .2s, box-shadow .2s;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.card-head{display:flex;align-items:center;gap:10px}
+.card-head .drink-emoji{font-size:30px}
+.card-title{font-family:Georgia,"Noto Serif SC",serif;font-size:20px;margin:0;color:var(--gold2)}
+.card-title .en{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+.tag{font-size:11px;padding:2px 10px;border-radius:999px;background:rgba(232,176,75,.14);border:1px solid var(--line);color:var(--gold2);white-space:nowrap}
+.ing-list{list-style:none;margin:0;padding:10px 12px;background:rgba(20,16,12,.4);border-radius:12px;display:flex;flex-direction:column;gap:6px}
+.ing-list li{display:flex;align-items:center;gap:10px;font-size:14px}
+.ing-list .e{font-size:18px;width:26px;text-align:center}
+.ing-list .n{color:var(--ink2)}
+.ing-list .a{margin-left:auto;color:var(--gold);font-size:13px;font-weight:600;white-space:nowrap}
+.block{margin-top:2px}
+.block .lbl{font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:2px}
+.block .txt{font-size:13.5px;color:var(--ink2);white-space:pre-wrap;margin:0}
+.card-actions{display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px dashed var(--line)}
+.btn{
+  padding:8px 14px;min-height:44px;border-radius:10px;border:1px solid transparent;cursor:pointer;
+  font-size:13px;font-family:inherit;transition:all .18s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--amber));color:#2a1603;font-weight:600}
+.btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--line2);color:var(--gold2)}
+.btn-danger{background:rgba(194,91,78,.12);border-color:rgba(194,91,78,.35);color:#e39a8f}
+.btn-danger:hover{background:rgba(194,91,78,.22)}
+.empty{text-align:center;padding:56px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+.empty .big{font-size:44px;margin-bottom:10px}
+
+/* forms */
+.form-card{max-width:760px;margin:0 auto;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--gold2);margin-bottom:7px;letter-spacing:1px}
+input[type=text],textarea,select{
+  width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(20,16,12,.55);color:var(--ink);font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:90px}
+select option{background:#241a11;color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ingredient rows */
+.ing-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ing-row{display:grid;grid-template-columns:44px 1.6fr 1fr 38px;gap:8px;align-items:center}
+.ing-row .e-btn{height:44px;border-radius:10px;border:1px solid var(--line);background:rgba(20,16,12,.55);font-size:20px;cursor:pointer;color:var(--gold2)}
+.ing-row .e-btn:hover{border-color:var(--gold)}
+.del-btn{height:44px;border-radius:10px;border:1px solid rgba(194,91,78,.35);background:rgba(194,91,78,.1);color:#e39a8f;cursor:pointer;font-size:15px}
+.add-ing{width:100%;padding:10px;border-radius:10px;border:1px dashed var(--line2);background:transparent;color:var(--gold2);cursor:pointer;font-size:13px}
+.add-ing:hover{background:rgba(232,176,75,.08)}
+
+/* emoji palette */
+.palette{
+  position:absolute;z-index:60;width:290px;max-height:320px;overflow:auto;
+  background:#241a11;border:1px solid var(--line2);border-radius:14px;padding:12px;box-shadow:var(--shadow);
+  display:none;
+}
+.palette.open{display:block}
+.palette .pg-label{font-size:11px;color:var(--muted);margin:6px 0 4px;letter-spacing:2px}
+.palette .pg{display:flex;flex-wrap:wrap;gap:2px}
+.palette .emo{font-size:21px;padding:4px 5px;border-radius:8px;cursor:pointer;line-height:1}
+.palette .emo:hover{background:rgba(232,176,75,.22);transform:scale(1.15)}
+.palette-hint{font-size:11px;color:var(--muted);padding:6px 2px 0;border-top:1px dashed var(--line);margin-top:6px}
+
+/* check-in */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center}
+.stat .sv{font-family:Georgia,serif;font-size:26px;color:var(--gold2);font-weight:700}
+.stat .sv span{font-size:13px;color:var(--muted);font-weight:400;margin-left:2px}
+.stat .sv.small{font-size:15px}
+.stat .sl{font-size:12px;color:var(--muted);margin-top:2px}
+.checkin-layout{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
+@media(max-width:860px){.checkin-layout{grid-template-columns:1fr}}
+.cal-card,.day-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-title{font-family:Georgia,"Noto Serif SC",serif;font-size:18px;color:var(--gold2)}
+.cal-nav{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:rgba(20,16,12,.5);color:var(--gold2);font-size:18px;cursor:pointer}
+.cal-nav:hover{border-color:var(--gold)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.cal .wd{text-align:center;font-size:12px;color:var(--muted);padding:4px 0}
+.day{position:relative;aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:rgba(20,16,12,.4);color:var(--ink2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:all .15s}
+.day:hover{border-color:var(--gold)}
+.day .dnum{font-size:14px}
+.day .dmark{font-size:15px;line-height:1}
+.day.done{background:linear-gradient(160deg,rgba(232,176,75,.3),rgba(255,157,92,.18));border-color:rgba(232,176,75,.5);color:var(--gold2)}
+.day.today{outline:2px solid var(--gold2);outline-offset:1px}
+.day.selected{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,157,92,.35)}
+.day.blank{visibility:hidden}
+
+/* day card */
+.day-head{border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:14px}
+.day-date{font-family:Georgia,"Noto Serif SC",serif;font-size:20px;color:var(--gold2)}
+.day-week{font-size:13px;color:var(--muted);margin-left:6px}
+.today-badge{font-size:11px;background:rgba(232,176,75,.2);color:var(--gold2);border-radius:999px;padding:2px 8px;margin-left:6px}
+.day-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.day-sec{margin-bottom:16px}
+.sec-lbl{font-size:13px;color:var(--gold2);margin-bottom:8px;letter-spacing:1px}
+.sec-lbl.small{font-size:12px;color:var(--muted)}
+.drink-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:20px}
+.drink-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px 6px 12px;border-radius:999px;background:rgba(232,176,75,.12);border:1px solid rgba(232,176,75,.35);color:var(--ink2);font-size:13px}
+.chip-x{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;padding:0 2px}
+.chip-x:hover{color:#e39a8f}
+.no-drink{color:var(--muted);font-size:13px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;max-height:150px;overflow:auto}
+.opt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);padding:6px 8px;border-radius:8px;background:rgba(20,16,12,.35);cursor:pointer}
+.opt:has(input:checked){background:rgba(232,176,75,.14);color:var(--gold2)}
+.opt input{accent-color:var(--gold)}
+.custom-row{display:flex;gap:8px}
+.custom-row input{flex:1}
+.moods{display:flex;flex-wrap:wrap;gap:8px}
+.mood{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(20,16,12,.4);color:var(--muted);cursor:pointer;font-size:18px}
+.mood span{font-size:11px}
+.mood:hover{border-color:var(--gold)}
+.mood.on{background:rgba(232,176,75,.16);border-color:var(--gold);color:var(--gold2)}
+.day-actions{display:flex;gap:10px;justify-content:flex-end;border-top:1px dashed var(--line);padding-top:14px}
+
+/* footer & toast */
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:44px;letter-spacing:1px}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:#3a2a1a;border:1px solid var(--line2);color:var(--gold2);padding:10px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:all .3s;box-shadow:var(--shadow);z-index:100}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:640px){
+  .palette{width:min(290px, calc(100vw - 24px))}
+  .brand-text{font-size:30px}
+  .brand-emoji{font-size:32px}
+  .row2{grid-template-columns:1fr}
+  .ing-row{grid-template-columns:40px 1fr 1fr 34px;gap:6px}
+  .grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="brand"><span class="brand-emoji">🥃</span><span class="brand-text">二十三的酒</span></div>
+    <div class="brand-sub">TWENTY-THREE · 调酒笔记与每日打卡</div>
+    <div class="date-chip" id="todayChip">📅 加载中…</div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="library">🍸 我的酒单</button>
+      <button class="tab" data-tab="add">📝 添加配方</button>
+      <button class="tab" data-tab="checkin">🥂 每日打卡</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page active" id="page-library">
+      <h2 class="page-title">🍸 我的酒单</h2>
+      <p class="page-desc">每一杯都值得被认真记下 · 今晚想喝哪一杯？</p>
+      <div class="grid" id="recipeGrid"></div>
+    </section>
+
+    <section class="page" id="page-add">
+      <h2 class="page-title" id="addTitle">📝 添加配方</h2>
+      <p class="page-desc">写下名字、配料和做法，配料会自动配上可爱的 emoji 🍋</p>
+      <form class="form-card" id="recipeForm">
+        <div class="row2">
+          <div class="field">
+            <label for="fName">鸡尾酒名称</label>
+            <input type="text" id="fName" placeholder="例如：莫吉托 Mojito" required>
+          </div>
+          <div class="field">
+            <label for="fCat">分类</label>
+            <select id="fCat">
+              <option>经典鸡尾酒</option>
+              <option>自创特调</option>
+              <option>无酒精 Mocktail</option>
+              <option>热饮</option>
+              <option>长饮</option>
+              <option>短饮</option>
+              <option>其他</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>配料 <span style="font-weight:400;color:var(--muted)">（点 emoji 按钮选表情，或输入配料名自动匹配）</span></label>
+          <div class="ing-editor" id="ingEditor"></div>
+          <button type="button" class="add-ing" id="addIngBtn">＋ 添加一种配料</button>
+        </div>
+        <div class="field">
+          <label for="fMethod">做法 / 步骤</label>
+          <textarea id="fMethod" placeholder="例如：&#10;1. 杯中放满碎冰和薄荷叶。&#10;2. 倒入朗姆酒、青柠汁和糖，搅拌均匀。&#10;3. 最后加苏打水，轻轻提拉。" rows="5"></textarea>
+        </div>
+        <div class="field">
+          <label for="fNote">小贴士 / 备注（可选）</label>
+          <input type="text" id="fNote" placeholder="例如：用鲜薄荷更有灵魂 🌿">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-ghost" id="cancelEdit" style="display:none">取消编辑</button>
+          <button type="submit" class="btn btn-primary">🍹 保存配方</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="page" id="page-checkin">
+      <h2 class="page-title">🥂 每日打卡</h2>
+      <p class="page-desc">记录每一个微醺的夜晚 · 理性饮酒，微醺就好</p>
+      <div class="stats-row" id="statsRow"></div>
+      <div class="checkin-layout">
+        <div class="cal-card">
+          <div class="cal-head">
+            <button class="cal-nav" id="calPrev" title="上个月">‹</button>
+            <div class="cal-title" id="calTitle">…</div>
+            <button class="cal-nav" id="calNext" title="下个月">›</button>
+          </div>
+          <div class="cal" id="calGrid"></div>
+          <button class="btn btn-ghost" id="calToday" style="margin-top:12px;width:100%">📅 回到今天</button>
+        </div>
+        <div class="day-card" id="dayCard"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">🍸 理性饮酒，微醺就好 · 数据保存在本机浏览器（localStorage）</footer>
+</div>
+
+<div class="palette" id="emojiPalette"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const LS_KEY='whisper_bar_v1';
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+
+const EMOJI_GROUPS=[
+  {label:'🍋 水果',items:['🍋','🍊','🍓','🫐','🍒','🍑','🍍','🍏','🍎','🍇','🍉','🥝','🍈','🍌','🥭','🍐','🍅','🥒','🫚','🌶️']},
+  {label:'🥃 酒与饮品',items:['🥃','🍸','🍹','🍺','🍷','🥂','🍾','🍶','🫗','🥤','🧃','🧉','☕','🍵','🫖','🥛','🍫']},
+  {label:'✨ 辅料与点缀',items:['🧊','💧','🍯','🍬','🍭','🧂','🥚','🍦','🥥','🌿','🍃','🌱','🍒','🥜','🌰']}
+];
+const EMOJI_HINT={'柠檬':'🍋','青柠':'🍋','橙':'🍊','橙子':'🍊','草莓':'🍓','蓝莓':'🫐','樱桃':'🍒','桃':'🍑','菠萝':'🍍','苹果':'🍏','葡萄':'🍇','西瓜':'🍉','猕猴桃':'🥝','芒果':'🥭','梨':'🍐','香蕉':'🍌','黄瓜':'🥒','薄荷':'🌿','香草':'🌿','迷迭香':'🌱','罗勒':'🌱','姜':'🫚','辣椒':'🌶️','威士忌':'🥃','朗姆':'🥃','金酒':'🍸','琴酒':'🍸','龙舌兰':'🥃','伏特加':'🥃','白兰地':'🥃','利口酒':'🫗','甜酒':'🫗','啤酒':'🍺','红酒':'🍷','香槟':'🥂','清酒':'🍶','气泡':'🍾','苏打':'🥤','汤力':'🥤','可乐':'🥤','果汁':'🧃','蜂蜜':'🍯','糖浆':'🍯','糖':'🍬','盐':'🧂','冰':'🧊','水':'💧','牛奶':'🥛','椰奶':'🥥','椰':'🥥','咖啡':'☕','茶':'🍵','抹茶':'🍵','蛋清':'🥚','奶油':'🍦','巧克力':'🍫','苦精':'🫗','肉桂':'🌰','肉豆蔻':'🌰'};
+const MOODS=[['😊','微醺正好'],['😌','舒服放松'],['🎉','尽兴而归'],['🥴','有点上头'],['🤢','下次注意']];
+const WEEK=['一','二','三','四','五','六','日'];
+const CAT_EMOJI={'经典鸡尾酒':'🍸','自创特调':'✨','无酒精 Mocktail':'🍹','热饮':'☕','长饮':'🍹','短饮':'🥃','其他':'🍸'};
+
+const SEED=[
+  {name:'莫吉托',en:'Mojito',cat:'经典鸡尾酒',ing:[['🥃','白朗姆酒','45 ml'],['🍋','青柠','半个'],['🌿','新鲜薄荷叶','8 片'],['🍬','白糖','2 茶匙'],['🥤','苏打水','适量'],['🧊','碎冰','满杯']],method:'1. 杯中放入薄荷叶、白糖和青柠角，轻轻捣出香气。\n2. 加满碎冰，倒入白朗姆酒。\n3. 搅拌均匀后补满苏打水，用薄荷叶点缀。',note:'用鲜薄荷更有灵魂 🌿'},
+  {name:'玛格丽特',en:'Margarita',cat:'经典鸡尾酒',ing:[['🥃','龙舌兰','45 ml'],['🍊','橙皮利口酒','20 ml'],['🍋','鲜青柠汁','20 ml'],['🧂','盐','杯口少许'],['🧊','冰块','适量']],method:'1. 杯口用青柠润湿后沾盐。\n2. 摇壶加冰，倒入三种材料摇匀。\n3. 滤入冰镇杯，用青柠片装饰。',note:'酸甜平衡是灵魂 🍋'},
+  {name:'金汤力',en:'Gin Tonic',cat:'长饮',ing:[['🍸','金酒','45 ml'],['🥤','汤力水','120 ml'],['🍋','青柠角','1 块'],['🧊','大冰块','2-3 块']],method:'1. 杯中放大冰块，倒入金酒。\n2. 沿杯壁缓缓倒入汤力水。\n3. 轻轻搅拌一下，挤入青柠角。',note:'简单却经典，夏夜绝配 ✨'},
+  {name:'威士忌酸',en:'Whiskey Sour',cat:'经典鸡尾酒',ing:[['🥃','波本威士忌','60 ml'],['🍋','鲜柠檬汁','30 ml'],['🍯','糖浆','15 ml'],['🥚','蛋清','1 个'],['🍒','樱桃','1 颗']],method:'1. 所有材料（除樱桃）加冰摇匀，力度大一点。\n2. 滤入冰镇杯，泡沫绵密。\n3. 用樱桃点缀，完成。',note:'干摇再湿摇，泡沫更绵密 🥚'},
+  {name:'教父',en:'Godfather',cat:'短饮',ing:[['🥃','苏格兰威士忌','45 ml'],['🫗','杏仁利口酒','15 ml'],['🧊','冰块','适量']],method:'1. 杯中放大冰块。\n2. 倒入威士忌与杏仁利口酒，轻轻搅拌。\n3. 可选：橙皮增香。',note:'杏仁香气像烟斗的味道 🫗'}
+];
+
+let state=load();
+let editId=null;
+let calYear,calMonth,selDate;
+let paletteRow=null;
+
+function load(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){const s=JSON.parse(raw); if(s&&Array.isArray(s.recipes)&&s.checkins) return s;}
+  }catch(e){}
+  const s={recipes:SEED.map(r=>({id:uid(),...r})),checkins:{}};
+  try{localStorage.setItem(LS_KEY,JSON.stringify(s));}catch(e){}
+  return s;
+}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){toast('⚠️ 保存失败：浏览器存储不可用');}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function todayStr(){return fmtDate(new Date())}
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function parseDate(s){const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function cnWeek(d){return '周'+WEEK[(d.getDay()+6)%7]}
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ===== tabs ===== */
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('.tab'); if(!b)return;
+  $$('.tab').forEach(x=>x.classList.toggle('active',x===b));
+  $$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+b.dataset.tab));
+});
+
+/* ===== library ===== */
+function renderLibrary(){
+  const grid=$('#recipeGrid');
+  if(!state.recipes.length){
+    grid.innerHTML='<div class="empty"><div class="big">🍸</div>酒柜空空如也…<br>去「添加配方」记下你的第一杯吧</div>';
+    return;
+  }
+  grid.innerHTML=state.recipes.map(r=>{
+    const ing=r.ing.map(i=>`<li><span class="e">${i[0]}</span><span class="n">${esc(i[1])}</span><span class="a">${esc(i[2])}</span></li>`).join('');
+    return `<article class="card" data-id="${r.id}">
+      <div class="card-head"><span class="drink-emoji">${r.emoji||CAT_EMOJI[r.cat]||'🍸'}</span>
+        <h3 class="card-title">${esc(r.name)}${r.en?`<span class="en">${esc(r.en)}</span>`:''}</h3>
+        <span class="tag">${esc(r.cat)}</span></div>
+      <ul class="ing-list">${ing}</ul>
+      ${r.method?`<div class="block"><div class="lbl">📖 做法</div><p class="txt">${esc(r.method)}</p></div>`:''}
+      ${r.note?`<div class="block"><div class="lbl">💡 小贴士</div><p class="txt">${esc(r.note)}</p></div>`:''}
+      <div class="card-actions">
+        <button class="btn btn-primary drink-now" data-id="${r.id}">🥂 今晚来一杯</button>
+        <button class="btn btn-ghost edit-recipe" data-id="${r.id}">✏️ 编辑</button>
+        <button class="btn btn-danger del-recipe" data-id="${r.id}">🗑 删除</button>
+      </div>
+    </article>`;
+  }).join('');
+}
+$('#recipeGrid').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  const id=b.dataset.id;
+  if(b.classList.contains('drink-now'))checkinToday(id);
+  else if(b.classList.contains('edit-recipe'))openEditor(id);
+  else if(b.classList.contains('del-recipe'))deleteRecipe(id);
+});
+function deleteRecipe(id){
+  const r=state.recipes.find(x=>x.id===id); if(!r)return;
+  if(!confirm('确定删除「'+r.name+'」吗？'))return;
+  state.recipes=state.recipes.filter(x=>x.id!==id);
+  save();renderLibrary();renderCheckinAll();toast('🗑 已删除');
+}
+function checkinToday(id){
+  const r=state.recipes.find(x=>x.id===id); if(!r)return;
+  const d=todayStr();
+  if(!state.checkins[d])state.checkins[d]={drinks:[],mood:'',note:''};
+  const ck=state.checkins[d];
+  if(!ck.drinks.find(x=>x.id===id)){
+    ck.drinks.push({id,name:r.name,emoji:r.emoji||CAT_EMOJI[r.cat]||'🍸'});
+    save();toast('🥂 已打卡：'+r.name);
+  }else toast('今天已经喝过这杯啦 😉');
+  renderCheckinAll();
+}
+/* ===== add / edit form ===== */
+function openEditor(id){
+  editId=id||null;
+  const r=id?state.recipes.find(x=>x.id===id):null;
+  $('#addTitle').textContent=r?'✏️ 编辑配方':'📝 添加配方';
+  $('#cancelEdit').style.display=r?'inline-flex':'none';
+  $('#fName').value=r?r.name:'';
+  $('#fCat').value=r?r.cat:'经典鸡尾酒';
+  $('#fMethod').value=r?r.method:'';
+  $('#fNote').value=r?r.note:'';
+  $('#ingEditor').innerHTML='';
+  const list=(r&&r.ing.length)?r.ing:[[null,'','']];
+  list.forEach(i=>addIngRow(i[0],i[1],i[2]));
+  $$('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='add'));
+  $$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-add'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function addIngRow(emoji,name,amount){
+  const row=document.createElement('div');
+  row.className='ing-row';
+  row.innerHTML=`<button type="button" class="e-btn" title="选 emoji">${emoji||'🙂'}</button>
+    <input type="text" class="ing-name" placeholder="配料名，如：青柠" value="${esc(name||'')}">
+    <input type="text" class="ing-amt" placeholder="用量，如：半个" value="${esc(amount||'')}">
+    <button type="button" class="del-btn" title="删除">✕</button>`;
+  row.querySelector('.e-btn').addEventListener('click',e=>openPalette(e.currentTarget,row));
+  row.querySelector('.ing-name').addEventListener('input',e=>{
+    const btn=row.querySelector('.e-btn');
+    const v=e.currentTarget.value.trim();
+    for(const k in EMOJI_HINT){if(v.indexOf(k)>-1){btn.textContent=EMOJI_HINT[k];break;}}
+  });
+  row.querySelector('.del-btn').addEventListener('click',()=>row.remove());
+  $('#ingEditor').appendChild(row);
+  row.querySelector('.ing-name').focus();
+}
+$('#addIngBtn').addEventListener('click',()=>addIngRow(null,'',''));
+$('#cancelEdit').addEventListener('click',()=>{
+  editId=null;$('#recipeForm').reset();$('#ingEditor').innerHTML='';addIngRow(null,'','');
+  $('#cancelEdit').style.display='none';$('#addTitle').textContent='📝 添加配方';
+  toast('已取消编辑');
+});
+$('#recipeForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('#fName').value.trim();
+  if(!name){toast('请先给这杯酒取个名字 🍸');return;}
+  const ing=[];
+  $$('#ingEditor .ing-row').forEach(row=>{
+    const n=row.querySelector('.ing-name').value.trim();
+    const a=row.querySelector('.ing-amt').value.trim();
+    const em=row.querySelector('.e-btn').textContent.trim();
+    if(n)ing.push([em==='🙂'?'🍸':em,n,a]);
+  });
+  const recipe={name,en:'',cat:$('#fCat').value,ing,method:$('#fMethod').value.trim(),note:$('#fNote').value.trim()};
+  recipe.emoji=CAT_EMOJI[recipe.cat]||'🍸';
+  if(editId){
+    const r=state.recipes.find(x=>x.id===editId);
+    Object.assign(r,recipe);
+    toast('✅ 已更新：'+name);
+  }else{
+    state.recipes.unshift({id:uid(),...recipe});
+    toast('🍹 配方已保存');
+  }
+  save();renderLibrary();renderCheckinAll();
+  editId=null;
+  $('#recipeForm').reset();$('#ingEditor').innerHTML='';addIngRow(null,'','');
+  $('#cancelEdit').style.display='none';$('#addTitle').textContent='📝 添加配方';
+  $$('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='library'));
+  $$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-library'));
+});
+
+/* ===== emoji palette ===== */
+function openPalette(btn,row){
+  paletteRow=row;
+  const p=$('#emojiPalette');
+  p.innerHTML=EMOJI_GROUPS.map(g=>`<div class="pg-label">${g.label}</div><div class="pg">${g.items.map(e=>`<span class="emo" data-e="${e}">${e}</span>`).join('')}</div>`).join('')
+    +'<div class="palette-hint">💡 输入配料名也能自动配 emoji</div>';
+  const r=btn.getBoundingClientRect();
+  p.style.left=Math.max(8,Math.min(r.left,window.innerWidth-310))+'px';
+  p.style.top=(r.bottom+window.scrollY+6)+'px';
+  p.classList.add('open');
+}
+$('#emojiPalette').addEventListener('click',e=>{
+  const em=e.target.closest('.emo'); if(!em)return;
+  if(paletteRow)paletteRow.querySelector('.e-btn').textContent=em.dataset.e;
+  $('#emojiPalette').classList.remove('open');
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.e-btn')&&!e.target.closest('#emojiPalette'))$('#emojiPalette').classList.remove('open');
+});
+/* ===== check-in ===== */
+function renderCheckinAll(){
+  if(calYear===undefined){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();}
+  if(!selDate)selDate=todayStr();
+  renderCalendar();renderDayPanel();renderStats();renderLibrary();
+}
+function renderCalendar(){
+  $('#calTitle').textContent=calYear+' 年 '+(calMonth+1)+' 月';
+  const grid=$('#calGrid');
+  const first=new Date(calYear,calMonth,1);
+  const offset=(first.getDay()+6)%7;
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const today=todayStr();
+  let html=WEEK.map(w=>`<div class="wd">${w}</div>`).join('');
+  for(let i=0;i<offset;i++)html+='<div class="day blank"></div>';
+  for(let d=1;d<=days;d++){
+    const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const ck=state.checkins[ds];
+    html+=`<button class="day ${ck?'done':''} ${ds===today?'today':''} ${ds===selDate?'selected':''}" data-d="${ds}">
+      <span class="dnum">${d}</span>${ck&&ck.mood?`<span class="dmark">${ck.mood}</span>`:''}
+    </button>`;
+  }
+  grid.innerHTML=html;
+}
+$('#calGrid').addEventListener('click',e=>{
+  const b=e.target.closest('.day'); if(!b||b.classList.contains('blank'))return;
+  selDate=b.dataset.d; renderCalendar();renderDayPanel();
+});
+$('#calPrev').addEventListener('click',()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();});
+$('#calNext').addEventListener('click',()=>{calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();});
+$('#calToday').addEventListener('click',()=>{
+  const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();selDate=todayStr();
+  renderCalendar();renderDayPanel();
+});
+
+function renderDayPanel(){
+  const card=$('#dayCard');
+  const d=parseDate(selDate);
+  const isToday=selDate===todayStr();
+  const ck=state.checkins[selDate];
+  let drinks='';
+  if(ck&&ck.drinks.length){
+    drinks=ck.drinks.map((x,i)=>`<span class="drink-chip">${x.emoji||'🍸'} ${esc(x.name)}<button class="chip-x" data-i="${i}" title="移除">✕</button></span>`).join('');
+  }else{
+    drinks='<div class="no-drink">这一天还没有记录 🫧</div>';
+  }
+  const moodBtns=MOODS.map(m=>`<button class="mood ${ck&&ck.mood===m[0]?'on':''}" data-m="${m[0]}">${m[0]}<span>${m[1]}</span></button>`).join('');
+  const libOpts=state.recipes.map(r=>`<label class="opt"><input type="checkbox" class="opt-cb" data-id="${r.id}" ${ck&&ck.drinks.find(x=>x.id===r.id)?'checked':''}>${r.emoji||'🍸'} ${esc(r.name)}</label>`).join('')||'<div class="no-drink">酒单还是空的，先去加配方吧 🍸</div>';
+  card.innerHTML=`
+    <div class="day-head">
+      <div class="day-date">${selDate} <span class="day-week">${cnWeek(d)}</span>${isToday?'<span class="today-badge">今天</span>':''}</div>
+      <div class="day-sub">${ck?'已记录这一晚 🥂':'今晚想喝点什么？'}</div>
+    </div>
+    <div class="day-sec">
+      <div class="sec-lbl">🍹 喝过的酒</div>
+      <div class="drink-chips" id="dayDrinks">${drinks}</div>
+      <div class="add-from" style="margin-top:12px">
+        <div class="sec-lbl small">从酒单选择</div>
+        <div class="opts">${libOpts}</div>
+        <div class="custom-row">
+          <input type="text" id="customDrink" placeholder="自定义一杯，如：自酿梅子酒 🍶">
+          <button type="button" class="btn btn-ghost" id="addCustom">添加</button>
+        </div>
+      </div>
+    </div>
+    <div class="day-sec">
+      <div class="sec-lbl">😌 今晚的状态</div>
+      <div class="moods">${moodBtns}</div>
+    </div>
+    <div class="day-sec">
+      <div class="sec-lbl">📝 备注</div>
+      <textarea id="dayNote" placeholder="写点什么：和谁喝的、配了什么小食…">${esc(ck?ck.note:'')}</textarea>
+    </div>
+    <div class="day-actions">
+      <button class="btn btn-primary" id="saveCheckin">🥂 保存打卡</button>
+      <button class="btn btn-danger" id="clearCheckin">清除这一天</button>
+    </div>`;
+
+  card.querySelector('#dayDrinks').addEventListener('click',e=>{
+    const x=e.target.closest('.chip-x'); if(!x)return;
+    if(!state.checkins[selDate])return;
+    state.checkins[selDate].drinks.splice(+x.dataset.i,1);
+    save();renderCalendar();renderDayPanel();renderStats();
+  });
+  card.querySelector('#addCustom').addEventListener('click',()=>{
+    const v=card.querySelector('#customDrink').value.trim(); if(!v)return;
+    if(!state.checkins[selDate])state.checkins[selDate]={drinks:[],mood:'',note:''};
+    state.checkins[selDate].drinks.push({id:'c'+uid(),name:v,emoji:'🍸'});
+    save();renderCalendar();renderDayPanel();renderStats();
+  });
+  card.querySelectorAll('.mood').forEach(b=>b.addEventListener('click',()=>{
+    if(!state.checkins[selDate])state.checkins[selDate]={drinks:[],mood:'',note:''};
+    state.checkins[selDate].mood=(state.checkins[selDate].mood===b.dataset.m)?'':b.dataset.m;
+    save();renderCalendar();renderDayPanel();
+  }));
+  card.querySelector('#saveCheckin').addEventListener('click',()=>{
+    if(!state.checkins[selDate])state.checkins[selDate]={drinks:[],mood:'',note:''};
+    const ck=state.checkins[selDate];
+    ck.note=card.querySelector('#dayNote').value.trim();
+    card.querySelectorAll('.opt-cb').forEach(cb=>{
+      const r=state.recipes.find(x=>x.id===cb.dataset.id); if(!r)return;
+      const inList=ck.drinks.find(x=>x.id===r.id);
+      if(cb.checked&&!inList)ck.drinks.push({id:r.id,name:r.name,emoji:r.emoji||CAT_EMOJI[r.cat]||'🍸'});
+      if(!cb.checked&&inList)ck.drinks=ck.drinks.filter(x=>x.id!==r.id);
+    });
+    save();renderCalendar();renderDayPanel();renderStats();
+    toast('🥂 打卡已保存');
+  });
+  card.querySelector('#clearCheckin').addEventListener('click',()=>{
+    if(!state.checkins[selDate])return;
+    if(!confirm('清除这一天的打卡记录？'))return;
+    delete state.checkins[selDate];
+    save();renderCalendar();renderDayPanel();renderStats();toast('已清除');
+  });
+}
+
+function renderStats(){
+  const today=todayStr();
+  const days=Object.keys(state.checkins);
+  const monthKey=today.slice(0,7);
+  const monthCount=days.filter(d=>d.startsWith(monthKey)).length;
+  let streak=0;
+  const d=new Date();
+  if(state.checkins[today]){streak=1;d.setDate(d.getDate()-1);}
+  while(state.checkins[fmtDate(d)]){streak++;d.setDate(d.getDate()-1);}
+  let total=0;const counts={};
+  days.forEach(ds=>{const ck=state.checkins[ds];(ck.drinks||[]).forEach(x=>{total++;counts[x.name]=(counts[x.name]||0)+1;});});
+  let fav='—';
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(top)fav=top[0]+' × '+top[1];
+  $('#statsRow').innerHTML=`
+    <div class="stat"><div class="sv">${monthCount}<span>天</span></div><div class="sl">本月打卡</div></div>
+    <div class="stat"><div class="sv">${streak}<span>天</span></div><div class="sl">连续打卡</div></div>
+    <div class="stat"><div class="sv">${total}<span>杯</span></div><div class="sl">累计微醺</div></div>
+    <div class="stat"><div class="sv small">${fav}</div><div class="sl">最常喝</div></div>`;
+}
+
+/* ===== init ===== */
+$('#todayChip').textContent='📅 '+todayStr()+' · '+cnWeek(new Date());
+addIngRow(null,'','');
+renderLibrary();
+renderCheckinAll();
+</script>
+</body>
+</html>
